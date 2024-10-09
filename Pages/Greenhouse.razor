@@ -47,6 +47,11 @@
                    @onchange="v => HandleHerbSelectionChanged(v, HerbType.Thyme)"
                    autocomplete="off" disabled="@(!_isPlanting)">
             <label class="btn btn-primary" for="thyme">Thyme</label>
+            
+            <input type="radio" class="btn-check" name="options" id="hanf" checked="@(_selectedHerb == HerbType.Hanf)"
+                   @onchange="v => HandleHerbSelectionChanged(v, HerbType.Hanf)"
+                   autocomplete="off" disabled="@(!_isPlanting)">
+            <label class="btn btn-primary" for="hanf">Hanf</label>
         </div>
         <div>
             <span>Time until next day: @_secondsToNextGrowth</span>
@@ -61,49 +66,27 @@
                     int potIndex = row * 8 + col;
                     var pot = pots[potIndex];
                     <div class="pot" @onclick="@(() => HandlePotClicked(pot))">
-                        @if (pot.Herb is not null)
+                    @if (pot.Herb is not null)
+                    {
+                        var imagePath = GetImagePath(pot.Herb.Type, pot.Herb.GrowthState);
+                        <img src="@imagePath" alt="@pot.Herb.GrowthState.ToString().ToLower()" width="@ImageSize" height="@ImageSize"/>
+                        <span>@pot.Herb.Type</span>
+                    }
+                    else
+                    {
+                        <img src="images/empty.png" alt="empty pot" width="@ImageSize" height="@ImageSize"/>
+                        <span>empty</span>
+                    }
+
+                    @code {
+                        private string GetImagePath(HerbType herbType, GrowthState growthState)
                         {
-                            switch (pot.Herb.GrowthState)
-                            {
-                                case GrowthState.Sapling:
-                                {
-                                    <img src="images/sapling.png" alt="sapling" width="@ImageSize" height="@ImageSize"/>
-
-                                    break;
-                                }
-                                case GrowthState.Growing:
-                                {
-                                    <img src="images/growing.png" alt="growing" width="@ImageSize" height="@ImageSize"/>
-
-                                    break;
-                                }
-                                case GrowthState.Mature:
-                                {
-                                    <img src="images/mature.png" alt="mature" width="@ImageSize" height="@ImageSize"/>
-
-                                    break;
-                                }
-                                case GrowthState.Wilting:
-                                {
-                                    <img src="images/wilting.png" alt="wilting" width="@ImageSize" height="@ImageSize"/>
-
-                                    break;
-                                }
-                                default:
-                                {
-                                    <!-- Unknown growth state -->
-
-                                    break;
-                                }
-                            }
-
-                            <span>@pot.Herb.Type</span>
+                            var basePath = "images/";
+                            var state = growthState.ToString().ToLower();
+                            var suffix = herbType == HerbType.Hanf ? "_weed" : string.Empty;
+                            return $"{basePath}{state}{suffix}.png";
                         }
-                        else
-                        {
-                            <img src="images/empty.png" alt="empty pot" width="@ImageSize" height="@ImageSize"/>
-                            <span>empty</span>
-                        }
+                    }
                     </div>
                 }
             </div>
